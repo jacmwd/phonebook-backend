@@ -1,7 +1,7 @@
 const express = require('express')
+const morgan = require('morgan')
 const app = express()
 
-app.use(express.json())
 
 let persons = [
     {
@@ -20,6 +20,21 @@ let persons = [
         "number": "999-321-4435"
     },
 ]
+
+morgan.token('host', function(req, res){
+    return req.hostname
+})
+morgan.token('body', function(req,res,param){
+    return JSON.stringify(req.body)
+})
+
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' })
+}
+
+app.use(express.json())
+app.use(morgan(':method :host :url :status :res[content-length] - :response-time ms :body'))
+
 
 app.get('/', (request, response) => {
     response.send('<h1>Phonebook</h1>')
@@ -67,7 +82,7 @@ app.post('/api/persons/', (request, response)=> {
         return response.status(400).json({
             error: 'missing number'
         })
-    } else if (persons.find(person => entry.name)) {
+    } else if (persons.find(person => person.name === entry.name)) {
         return response.status(400).json({
             error: 'this name already exists in phonebook'
         })
@@ -75,7 +90,10 @@ app.post('/api/persons/', (request, response)=> {
     
     persons= persons.concat(person)
     response.json(person)
+    
 })
+
+app.use(unknownEndpoint)
 
 const PORT = 3001
 app.listen(PORT, () => {
