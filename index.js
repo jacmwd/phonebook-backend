@@ -58,6 +58,21 @@ app.post('/api/persons/', (request, response)=> {
         name: entry.name,
         number: entry.number
     }
+
+    if (!entry.name) {
+        return response.status(400).json({
+            error: 'missing name'
+        })
+    } else if (!entry.number) {
+        return response.status(400).json({
+            error: 'missing number'
+        })
+    } else if (persons.find(person => entry.name)) {
+        return response.status(400).json({
+            error: 'this name already exists in phonebook'
+        })
+    }
+    
     persons= persons.concat(person)
     response.json(person)
 })
