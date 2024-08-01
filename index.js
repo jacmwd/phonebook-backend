@@ -43,6 +43,12 @@ app.get('/info', (request, response)=> {
     response.send(`Phonebook has info for ${persons.length} people.</br> ${new Date()}`)
 })
 
+app.delete('/api/persons/:id', (request, response)=> {
+    const id = request.params.id
+    persons = persons.filter(person => person.id !== id)
+    response.status(204).end()
+})
+
 const PORT = 3001
 app.listen(PORT, () => {
     console.log(`Server is running on ${PORT}`)
