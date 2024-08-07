@@ -1,5 +1,6 @@
 const express = require('express')
 const morgan = require('morgan')
+const cors = require('cors')
 const app = express()
 
 
@@ -34,6 +35,7 @@ const unknownEndpoint = (request, response) => {
 
 app.use(express.json())
 app.use(morgan(':method :host :url :status :res[content-length] - :response-time ms :body'))
+app.use(cors())
 
 
 app.get('/', (request, response) => {
