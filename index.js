@@ -2,7 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
-const Note = require('./mongo')
+const Entry = require('./mongo')
 const app = express()
 
 
@@ -46,7 +46,7 @@ app.get('/', (request, response) => {
 })
 
 app.get('/api/persons', (request, response) => {
-    Note.find({}).then(notes => response.json(notes))
+    Entry.find({}).then(notes => response.json(notes))
 })
 
 app.get('/api/persons/:id', (request, response)=> {
@@ -71,30 +71,39 @@ app.delete('/api/persons/:id', (request, response)=> {
 })
 
 app.post('/api/persons/', (request, response)=> {
-    const entry = request.body
-    const generateId =() => String(Math.floor(Math.random()*200))
-    const person = {
+    const body = request.body
+    //const generateId =() => String(Math.floor(Math.random()*200))
+    /*const person = {
         id: generateId(),
         name: entry.name,
         number: entry.number
-    }
+    }*/
+    
+    const entry = new Entry({
+        name: body.name,
+        number: body.number
+    })
 
-    if (!entry.name) {
+    entry.save().then(savedNote => {
+        response.json(savedNote)
+    })
+
+    if (!body.name) {
         return response.status(400).json({
             error: 'missing name'
         })
-    } else if (!entry.number) {
+    } else if (!body.number) {
         return response.status(400).json({
             error: 'missing number'
         })
-    } else if (persons.find(person => person.name === entry.name)) {
+    } /*else if (persons.find(person => person.name === entry.name)) {
         return response.status(400).json({
             error: 'this name already exists in phonebook'
         })
-    }
+    }*/
     
-    persons= persons.concat(person)
-    response.json(person)
+    //persons= persons.concat(person)
+    //response.json(person)
     
 })
 
