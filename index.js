@@ -2,7 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
-const Entry = require('./mongo')
+const Entry = require('./models/entry')
 const app = express()
 
 
