@@ -34,6 +34,7 @@ morgan.token('body', function(req,res,param){
 const unknownEndpoint = (request, response) => {
     response.status(404).send({ error: 'unknown endpoint' })
 }
+app.use(unknownEndpoint)
 
 app.use(express.json())
 app.use(morgan(':method :host :url :status :res[content-length] - :response-time ms :body'))
@@ -64,7 +65,7 @@ app.get('/info', (request, response)=> {
     response.send(`Phonebook has info for ${persons.length} people.</br> ${new Date()}`)
 })
 
-app.delete('/api/persons/:id', (request, response)=> {
+app.delete('/api/persons/:id', (request, response, next)=> {
     Entry.findByIdAndDelete(request.params.id)
         .then(result => response.status(200).end())
         .catch(error => next(error))
@@ -107,8 +108,12 @@ app.post('/api/persons/', (request, response)=> {
     
 })
 
+const errorHandler = (error, request, response, next) => {
+    res.status(500)
+    res.render({ 'error': error.message })
+}
 
-app.use(unknownEndpoint)
+app.use(errorHandler)
 
 const PORT = process.env.PORT 
 app.listen(PORT, () => {
