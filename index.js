@@ -59,8 +59,10 @@ app.get('/api/persons/:id', (request, response)=> {
     Entry.findById(request.params.id).then(notes => response.json(notes))
 })
 
-app.get('/info', (request, response)=> {
-    response.send(`Phonebook has info for ${persons.length} people.</br> ${new Date()}`)
+app.get('/info', (request, response, next)=> {
+    Entry.find({})
+        .then(notes => response.send(`Phonebook has info for ${notes.length} people.</br> ${new Date()}`))
+        .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response, next)=> {
