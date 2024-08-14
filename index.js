@@ -31,11 +31,6 @@ morgan.token('body', function(req,res,param){
     return JSON.stringify(req.body)
 })
 
-const unknownEndpoint = (request, response) => {
-    response.status(404).send({ error: 'unknown endpoint' })
-}
-app.use(unknownEndpoint)
-
 app.use(express.json())
 app.use(morgan(':method :host :url :status :res[content-length] - :response-time ms :body'))
 app.use(cors())
@@ -46,19 +41,22 @@ app.get('/', (request, response) => {
     response.send('<h1>Phonebook</h1>')
 })
 
-app.get('/api/persons', (request, response) => {
-    Entry.find({}).then(notes => response.json(notes))
+app.get('/api/persons', (request, response, next) => {
+    Entry.find({})
+        .then(notes => response.json(notes))
+        .catch(error => next(error))
 })
 
 app.get('/api/persons/:id', (request, response)=> {
-    const id = request.params.id
+    /*const id = request.params.id
     const entry = persons.find(entry => entry.id === id)
     
     if (entry) {
         response.json(entry)
     } else {
         response.status(404).end('Entry not found')
-    }
+    }*/
+    Entry.findById(request.params.id).then(notes => response.json(notes))
 })
 
 app.get('/info', (request, response)=> {
@@ -107,6 +105,11 @@ app.post('/api/persons/', (request, response)=> {
     //response.json(person)
     
 })
+
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' })
+}
+app.use(unknownEndpoint)
 
 const errorHandler = (error, request, response, next) => {
     res.status(500)
