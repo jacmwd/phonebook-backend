@@ -64,14 +64,10 @@ app.post('/api/persons/', (request, response, next)=> {
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
-    const body = request.body
+    const { name, number } = request.body
 
-    const note = {
-        name: body.name,
-        number: body.number
-    }
-
-    Entry.findByIdAndUpdate(request.params.id, note)
+    Entry.findByIdAndUpdate(request.params.id, { name, number }, { new: true, runValidators: true })
+    //{ new: true } automatically returns new entry
         .then(updatedNote => response.json(updatedNote))
         .catch(error => next(error))
 })
