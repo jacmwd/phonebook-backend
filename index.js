@@ -6,24 +6,6 @@ const Entry = require('./models/entry')
 const app = express()
 
 
-let persons = [
-    {
-        "id": "1",
-        "name": "daVinci",
-        "number": "045-678-999"
-    },
-    {
-        "id": "2",
-        "name": "Michaeangelo",
-        "number": "678-999-234"
-    },
-    {
-        "id": "3",
-        "name": "Monet",
-        "number": "999-321-4435"
-    },
-]
-
 morgan.token('host', function(req, res){
     return req.hostname
 })
@@ -47,16 +29,10 @@ app.get('/api/persons', (request, response, next) => {
         .catch(error => next(error))
 })
 
-app.get('/api/persons/:id', (request, response)=> {
-    /*const id = request.params.id
-    const entry = persons.find(entry => entry.id === id)
-    
-    if (entry) {
-        response.json(entry)
-    } else {
-        response.status(404).end('Entry not found')
-    }*/
-    Entry.findById(request.params.id).then(notes => response.json(notes))
+app.get('/api/persons/:id', (request, response, next)=> {
+    Entry.findById(request.params.id)
+        .then(notes => response.json(notes))
+        .catch(error => next(error))
 })
 
 app.get('/info', (request, response, next)=> {
@@ -73,12 +49,6 @@ app.delete('/api/persons/:id', (request, response, next)=> {
 
 app.post('/api/persons/', (request, response)=> {
     const body = request.body
-    //const generateId =() => String(Math.floor(Math.random()*200))
-    /*const person = {
-        id: generateId(),
-        name: entry.name,
-        number: entry.number
-    }*/
     
     const entry = new Entry({
         name: body.name,
@@ -97,14 +67,7 @@ app.post('/api/persons/', (request, response)=> {
         return response.status(400).json({
             error: 'missing number'
         })
-    } /*else if (persons.find(person => person.name === entry.name)) {
-        return response.status(400).json({
-            error: 'this name already exists in phonebook'
-        })
-    }*/
-    
-    //persons= persons.concat(person)
-    //response.json(person)
+    }
     
 })
 
@@ -127,8 +90,11 @@ const unknownEndpoint = (request, response) => {
 app.use(unknownEndpoint)
 
 const errorHandler = (error, request, response, next) => {
-    res.status(500)
-    res.render({ 'error': error.message })
+    console.error(error.message)
+    if (error.name === 'CastError') {
+        return response.status(400).send({ error: 'malformatted id' })
+    }
+    next(error)
 }
 
 app.use(errorHandler)
