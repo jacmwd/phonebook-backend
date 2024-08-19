@@ -2,7 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
-const Entry = require('./models/entry')
+const Person = require('./models/person')
 const app = express()
 
 
@@ -24,25 +24,25 @@ app.get('/', (request, response) => {
 })
 
 app.get('/api/persons', (request, response, next) => {
-    Entry.find({})
+    Person.find({})
         .then(notes => response.json(notes))
         .catch(error => next(error))
 })
 
 app.get('/api/persons/:id', (request, response, next)=> {
-    Entry.findById(request.params.id)
+    Person.findById(request.params.id)
         .then(notes => response.json(notes))
         .catch(error => next(error))
 })
 
 app.get('/info', (request, response, next)=> {
-    Entry.find({})
+    Person.find({})
         .then(notes => response.send(`Phonebook has info for ${notes.length} people.</br> ${new Date()}`))
         .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response, next)=> {
-    Entry.findByIdAndDelete(request.params.id)
+    Person.findByIdAndDelete(request.params.id)
         .then(result => response.status(200).end())
         .catch(error => next(error))
 })
@@ -50,12 +50,12 @@ app.delete('/api/persons/:id', (request, response, next)=> {
 app.post('/api/persons/', (request, response, next)=> {
     const body = request.body
     
-    const entry = new Entry({
+    const person = new Person({
         name: body.name,
         number: body.number
     })
 
-    entry.save()
+    person.save()
         .then(savedNote => {
         response.json(savedNote)
         })
@@ -66,8 +66,8 @@ app.post('/api/persons/', (request, response, next)=> {
 app.put('/api/persons/:id', (request, response, next) => {
     const { name, number } = request.body
 
-    Entry.findByIdAndUpdate(request.params.id, { name, number }, { new: true, runValidators: true })
-    //{ new: true } automatically returns new entry
+    Person.findByIdAndUpdate(request.params.id, { name, number }, { new: true, runValidators: true })
+    //{ new: true } automatically returns new person
         .then(updatedNote => response.json(updatedNote))
         .catch(error => next(error))
 })

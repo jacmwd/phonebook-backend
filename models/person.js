@@ -1,7 +1,5 @@
 const mongoose = require('mongoose')
 
-//const password = process.argv[2]
-
 const url = process.env.MONGODB_URI
 
 mongoose.set('strictQuery', false)
@@ -16,7 +14,7 @@ mongoose.connect(url)
         console.log('error connecting to MongoDB', error.message)
     })
 
-const entrySchema = new mongoose.Schema({
+const personSchema = new mongoose.Schema({
     name: {
         type: String,
         minLength: 3
@@ -31,7 +29,7 @@ const entrySchema = new mongoose.Schema({
     }
 })
 
-entrySchema.set('toJSON', {
+personSchema.set('toJSON', {
     transform: (document, returnedObject) => {
         returnedObject.id = returnedObject._id.toString()
         delete returnedObject._id
@@ -39,4 +37,4 @@ entrySchema.set('toJSON', {
     }
 })
 
-module.exports = mongoose.model('Entry', entrySchema)
+module.exports = mongoose.model('Person', personSchema)
