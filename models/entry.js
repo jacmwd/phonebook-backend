@@ -21,7 +21,14 @@ const entrySchema = new mongoose.Schema({
         type: String,
         minLength: 3
     },
-    number: String,
+    number: {
+        type: String,
+        minLength: 8,
+        validate: {
+            validator: v=> /^\d{2,3}-\d{6,}$/.test(v),
+            message: "this is not a valid number"
+        }
+    }
 })
 
 entrySchema.set('toJSON', {
